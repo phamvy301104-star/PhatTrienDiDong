@@ -36,6 +36,27 @@ const BookAppointmentScreen = ({route, navigation}) => {
     }
   };
 
+  // Generate next 7 days for date selection
+  const getNextDays = () => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      days.push(date);
+    }
+    return days;
+  };
+
+  const formatDate = date => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return {
+      day: days[date.getDay()],
+      date: date.getDate(),
+      month: months[date.getMonth()],
+    };
+  };
+
   const timeSlots = [
     '09:00',
     '10:00',
@@ -99,6 +120,30 @@ const BookAppointmentScreen = ({route, navigation}) => {
     </TouchableOpacity>
   );
 
+  const renderDateSlot = ({item}) => {
+    const formatted = formatDate(item);
+    const isSelected = item.toDateString() === selectedDate.toDateString();
+    
+    return (
+      <TouchableOpacity
+        style={[
+          styles.dateSlot,
+          isSelected && styles.selectedDateSlot,
+        ]}
+        onPress={() => setSelectedDate(item)}>
+        <Text style={[styles.dayText, isSelected && styles.selectedDateText]}>
+          {formatted.day}
+        </Text>
+        <Text style={[styles.dateText, isSelected && styles.selectedDateText]}>
+          {formatted.date}
+        </Text>
+        <Text style={[styles.monthText, isSelected && styles.selectedDateText]}>
+          {formatted.month}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
   const renderTimeSlot = ({item}) => (
     <TouchableOpacity
       style={[
@@ -139,6 +184,16 @@ const BookAppointmentScreen = ({route, navigation}) => {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.barberList}
+      />
+
+      <Text style={styles.sectionTitle}>Select Date</Text>
+      <FlatList
+        data={getNextDays()}
+        renderItem={renderDateSlot}
+        keyExtractor={item => item.toDateString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.dateList}
       />
 
       <Text style={styles.sectionTitle}>Select Time</Text>
@@ -233,6 +288,42 @@ const styles = StyleSheet.create({
   barberRating: {
     fontSize: 14,
     color: '#FFD700',
+  },
+  dateList: {
+    paddingBottom: 15,
+  },
+  dateSlot: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginRight: 10,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    alignItems: 'center',
+    minWidth: 70,
+  },
+  selectedDateSlot: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  dayText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 2,
+  },
+  dateText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 2,
+  },
+  monthText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  selectedDateText: {
+    color: '#fff',
   },
   timeSlotList: {
     paddingBottom: 20,
